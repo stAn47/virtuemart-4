@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+***
+
+## 1.0.1
+Release date: May, 3rd 2023
+
+### Fixed
++ PLGVIR4-41: Fix an issue related to 'VMuikit X' where payment methods won't be shown in this third party checkout.
+
+***
+
 ## 1.0.0
 Release date: March, 29th 2023
 

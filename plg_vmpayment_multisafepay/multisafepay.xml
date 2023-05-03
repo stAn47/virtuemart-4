@@ -7,7 +7,7 @@
     <authorEmail><![CDATA[integration@multisafepay.com]]></authorEmail>
     <copyright>Copyright (C) 2023 MultiSafepay</copyright>
     <license>https://www.gnu.org/licenses/gpl-3.0.html GNU/GPL</license>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <description><![CDATA[MultiSafepay payment plugin for Virtuemart 4]]></description>
     <files>
         <filename plugin="multisafepay">multisafepay.xml</filename>
