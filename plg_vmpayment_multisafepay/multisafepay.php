@@ -129,7 +129,11 @@ class plgVmPaymentMultisafepay extends vmPSPlugin
         $totalInPaymentCurrency = round($paymentCurrency->convertCurrencyTo($method->payment_currency, $order['details']['BT']->order_total, false), 2);
 
         $this->_virtuemart_paymentmethod_id = $order['details']['BT']->virtuemart_paymentmethod_id;
-        $issuer = $this->_getSelectedBank($this->_virtuemart_paymentmethod_id) ?? '';
+        $issuer = '';
+        // If VMuikit X is not installed, we can't get the related bank id, enabling also the transaction type as direct because issuer exists
+        if (($method->multisafepay_gateway === 'IDEAL') && !JComponentHelper::getComponent('com_vmuikitx', true)->enabled) {
+            $issuer = $this->_getSelectedBank($this->_virtuemart_paymentmethod_id) ?? '';
+        }
 
         $dbValues['order_number'] = $order['details']['BT']->order_number;
         $dbValues['payment_name'] = $this->renderPluginName($method);
@@ -575,11 +579,15 @@ class plgVmPaymentMultisafepay extends vmPSPlugin
                 $msp->merchant['site_id'] = $method->multisafepay_site_id;
                 $msp->merchant['site_code'] = $method->multisafepay_secure_code;
                 $msp->merchant['api_key'] = $method->multisafepay_api_key;
-                $relatedBanks = $msp->getIdealIssuers();
 
-                $selected_bank = $this->_getSelectedBank($method->virtuemart_paymentmethod_id);
+                $relatedBanksDropDown = '';
+                // If VMuikit X is not installed, we can't get the related bank id, enabling also the transaction type as direct because issuer exists
+                if (!JComponentHelper::getComponent('com_vmuikitx', true)->enabled) {
+                    $relatedBanks = $msp->getIdealIssuers();
+                    $selected_bank = $this->_getSelectedBank($method->virtuemart_paymentmethod_id);
 
-                $relatedBanksDropDown = $this->getRelatedBanksDropDown($relatedBanks, $method->virtuemart_paymentmethod_id, $selected_bank);
+                    $relatedBanksDropDown = $this->getRelatedBanksDropDown($relatedBanks, $method->virtuemart_paymentmethod_id, $selected_bank);
+                }
                 $logo = $this->displayLogos($method->payment_logos);
                 $payment_cost = '';
                 if ($methodSalesPrice) {
@@ -599,7 +607,7 @@ class plgVmPaymentMultisafepay extends vmPSPlugin
                     'relatedBanks' => $relatedBanksDropDown
                 ]);
 
-                $htmla[] = $html;
+                $htmla[(int)$method->virtuemart_paymentmethod_id] = trim($html);
             }
             elseif ($this->checkConditions($cart, $method, $cart->cartPrices)) {
                 $methodSalesPrice = $this->calculateSalesPrice($cart, $method, $cart->cartPrices);
@@ -621,13 +629,16 @@ class plgVmPaymentMultisafepay extends vmPSPlugin
                     'payment_cost' => $payment_cost
                 ]);
 
-                $htmla[] = $html;
+                $htmla[(int)$method->virtuemart_paymentmethod_id] = trim($html);
             }
         }
-        if (!empty($htmla) && !is_null($htmlIn)) {
-            $htmlIn[] = $htmla;
-        }
 
+        if (is_null($htmlIn)) {
+            $htmlIn = [];
+        }
+        if (!empty($htmla)) {
+            $htmlIn['payment'] = $htmla;
+        }
         return true;
     }
 
@@ -969,7 +980,8 @@ class plgVmPaymentMultisafepay extends vmPSPlugin
         if ($method->multisafepay_gateway) {
             $method->multisafepay_gateway = strtoupper(trim($method->multisafepay_gateway));
 
-            if ($method->multisafepay_gateway === 'IDEAL') {
+            // If VMuikit X is not installed, we can't get the related bank id, enabling also the transaction type as direct because issuer exists
+            if (($method->multisafepay_gateway === 'IDEAL') && !JComponentHelper::getComponent('com_vmuikitx', true)->enabled) {
                 $payment_params['multisafepay_ideal_bank_selected_' . $cart->virtuemart_paymentmethod_id] = vRequest::getVar('multisafepay_ideal_bank_selected_' . $cart->virtuemart_paymentmethod_id);
                 if (empty($payment_params['multisafepay_ideal_bank_selected_' . $cart->virtuemart_paymentmethod_id])) {
                     vmInfo('VMPAYMENT_MULTISAFEPAY_IDEAL_PLEASE_SELECT_BANK');
@@ -978,7 +990,6 @@ class plgVmPaymentMultisafepay extends vmPSPlugin
                 self::_setMultiSafepayIdealIntoSession($payment_params);
             }
         }
-
         return true;
     }
 
@@ -1043,13 +1054,13 @@ class plgVmPaymentMultisafepay extends vmPSPlugin
         if ($method->multisafepay_gateway) {
             $method->multisafepay_gateway = strtoupper(trim($method->multisafepay_gateway));
 
-            if ($method->multisafepay_gateway === 'IDEAL') {
+            // If VMuikit X is not installed, we can't get the related bank id, enabling also the transaction type as direct because issuer exists
+            if (($method->multisafepay_gateway === 'IDEAL') && !JComponentHelper::getComponent('com_vmuikitx', true)->enabled) {
                 $payment_params['multisafepay_ideal_bank_selected_' . $cart->virtuemart_paymentmethod_id] = vRequest::getVar('multisafepay_ideal_bank_selected_' . $cart->virtuemart_paymentmethod_id);
 
                 if (empty($payment_params['multisafepay_ideal_bank_selected_' . $cart->virtuemart_paymentmethod_id])) {
                     $payment_params['multisafepay_ideal_bank_selected_' . $cart->virtuemart_paymentmethod_id] = $this->_getSelectedBank($cart->virtuemart_paymentmethod_id);
                 }
-
                 if (empty($payment_params['multisafepay_ideal_bank_selected_' . $cart->virtuemart_paymentmethod_id])) {
                     vmInfo('VMPAYMENT_MULTISAFEPAY_IDEAL_PLEASE_SELECT_BANK');
                     return false;
