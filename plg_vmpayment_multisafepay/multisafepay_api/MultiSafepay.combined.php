@@ -22,7 +22,7 @@ if (!class_exists('MultiSafepay'))
 {
     class MultiSafepay
     {
-        public const MSP_VERSION = '1.0.1';
+        public const MSP_VERSION = '1.0.2';
 
         public string $plugin_name = '';
         public string $version = '';

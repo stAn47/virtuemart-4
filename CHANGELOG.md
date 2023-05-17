@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ***
 
+## 1.0.2
+Release date: May, 17th 2023
+
+### Fixed
++ PLGVIR4-44: Rectify the solution implemented in PLGVIR4-41 by ensuring its functionality across all scenarios, and prevent the insertion of HTML tags in the payment name database field.
+
+***
+
 ## 1.0.1
 Release date: May, 3rd 2023
 
