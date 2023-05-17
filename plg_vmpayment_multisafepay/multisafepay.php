@@ -136,7 +136,7 @@ class plgVmPaymentMultisafepay extends vmPSPlugin
         }
 
         $dbValues['order_number'] = $order['details']['BT']->order_number;
-        $dbValues['payment_name'] = $this->renderPluginName($method);
+        $dbValues['payment_name'] = trim(strip_tags($method->payment_name));
         $dbValues['virtuemart_paymentmethod_id'] = $this->_virtuemart_paymentmethod_id;
         $dbValues['cost_per_transaction'] = $method->cost_per_transaction;
         $dbValues['cost_percent_total'] = $method->cost_percent_total;
@@ -633,11 +633,18 @@ class plgVmPaymentMultisafepay extends vmPSPlugin
             }
         }
 
-        if (is_null($htmlIn)) {
+        if (empty($htmlIn)) {
             $htmlIn = [];
         }
+
         if (!empty($htmla)) {
-            $htmlIn['payment'] = $htmla;
+            if (empty($htmlIn['payment'])) {
+                $htmlIn['payment'] = [];
+            }
+
+            foreach ($htmla as $key => $value) {
+                $htmlIn['payment'][$key] = $value;
+            }
         }
         return true;
     }
