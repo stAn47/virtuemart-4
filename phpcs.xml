@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<ruleset name="MultiSafepay-Extended">
+    <description>A custom coding standard for VirtueMart 4 plugin</description>
+    <exclude-pattern>*/github/*</exclude-pattern>
+    <exclude-pattern>*/bin/*</exclude-pattern>
+    <exclude-pattern>*/plg_vmpayment_multisafepay/language/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/multisafepay.xml</exclude-pattern>
+    <config name="testVersion" value="8.1-8.2" />
+    <rule ref="PSR12">
+        <exclude name="PSR1.Files.SideEffects.FoundWithSymbols" />
+        <exclude name="Squiz.Classes.ValidClassName.NotCamelCaps" />
+        <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace" />
+        <exclude name="Generic.Files.LineLength.TooLong" />
+        <exclude name="PSR12.Files.FileHeader.SpacingAfterBlock" />
+        <exclude name="PSR12.Files.OpenTag.NotAlone" />
+        <exclude name="PSR12.Files.FileHeader.IncorrectOrder" />
+    </rule>
+    <rule ref="Generic.CodeAnalysis.AssignmentInCondition" />
+    <rule ref="PHPCompatibility">
+        <exclude name="PHPCompatibility.Constants.NewConstants.json_throw_on_errorFound" />
+    </rule>
+</ruleset>

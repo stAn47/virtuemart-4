@@ -31,11 +31,10 @@ rm "$FILENAME_PREFIX""$RELEASE_VERSION".zip
 cd "$FOLDER_PREFIX"
 
 # Install composer without dev dependencies
-# composer install --no-dev
+composer install --no-dev
 
 # Zip everything excluding some specific files
-# zip -9 -r "$FILENAME_PREFIX""$RELEASE_VERSION".zip ./* -x "composer.json" -x "composer.lock" -x "modman"
-zip -9 -r "$FILENAME_PREFIX""$RELEASE_VERSION".zip ./*
+zip -9 -r "$FILENAME_PREFIX""$RELEASE_VERSION".zip ./* -x "composer.json" -x "composer.lock" -x "modman" -x "DEVELOPMENT.md" -x "phpcs.xml"
 
 # Move the zip file to the root of the release folder
 mv "$FILENAME_PREFIX""$RELEASE_VERSION".zip ../

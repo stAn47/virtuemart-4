@@ -10,11 +10,11 @@
     <version>1.0.1</version>
     <description><![CDATA[MultiSafepay payment plugin for Virtuemart 4]]></description>
     <files>
-        <filename plugin="multisafepay">multisafepay.xml</filename>
         <filename plugin="multisafepay">multisafepay.php</filename>
+        <filename plugin="multisafepay">multisafepay.xml</filename>
         <folder>language</folder>
         <folder>multisafepay</folder>
-        <folder>multisafepay_api</folder>
+        <folder>vendor</folder>
     </files>
     <languages folder="language">
         <language tag="en-GB">en-GB/en-GB.plg_vmpayment_multisafepay.ini</language>
@@ -23,9 +23,6 @@
         <fields name="params">
             <fieldset name="account">
                 <field type="vmtitle" default="VMPAYMENT_MULTISAFEPAY_ACCOUNT_SETTINGS" description="" />
-                <field name="multisafepay_account_id" type="text" label="VMPAYMENT_MULTISAFEPAY_ACCOUNT_ID" description="VMPAYMENT_MULTISAFEPAY_ACCOUNT_ID_DESC" />
-                <field name="multisafepay_site_id" type="text" label="VMPAYMENT_MULTISAFEPAY_SITE_ID" description="VMPAYMENT_MULTISAFEPAY_SITE_ID_DESC" />
-                <field name="multisafepay_secure_code" type="text" label="VMPAYMENT_MULTISAFEPAY_SECURE_CODE" description="VMPAYMENT_MULTISAFEPAY_SECURE_CODE_DESC" />
                 <field name="multisafepay_api_key" type="text" label="VMPAYMENT_MULTISAFEPAY_API_KEY" description="VMPAYMENT_MULTISAFEPAY_API_KEY_DESC" />
                 <field name="sandbox" type="radio" default="0" label="VMPAYMENT_MULTISAFEPAY_SANDBOX" description="VMPAYMENT_MULTISAFEPAY_SANDBOX_DESC">
                     <option value="0">Live</option>
