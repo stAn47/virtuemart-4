@@ -779,11 +779,16 @@ class MultiSafepayLibrary
      */
     private function getIpForwarded(): string
     {
-        $ip_forwarded = '';
         if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $ip_forwarded = filter_var($_SERVER['HTTP_X_FORWARDED_FOR'], FILTER_VALIDATE_IP);
+            $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            foreach ($ips as $ip) {
+                $filtered_ip = filter_var(trim($ip), FILTER_VALIDATE_IP);
+                if ($filtered_ip !== false) {
+                    return $filtered_ip;
+                }
+            }
         }
-        return $ip_forwarded;
+        return '';
     }
 
     /**
