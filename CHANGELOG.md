@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ***
 
+## 2.0.1
+Release date: Sep, 6th 2023
+
+### Fixed
++ PLGVIR4-50: Fix the method used to retrieve the forwarded IP address to ensure that it cannot return a boolean value.
+
+***
+
 ## 2.0.0
 Release date: Aug, 2nd 2023
 
