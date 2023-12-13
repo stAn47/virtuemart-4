@@ -21,6 +21,9 @@
     </languages>
     <config>
         <fields name="params">
+		<fieldset name="basic" >
+				<field type="text" name="order_prefix"  	size="40" label="MSP Site Order Prefix" default="" description="Set an order prefix if this MSP account is shared with more sites" />
+		</fieldset>
             <fieldset name="account">
                 <field type="vmtitle" default="VMPAYMENT_MULTISAFEPAY_ACCOUNT_SETTINGS" description="" />
                 <field name="multisafepay_api_key" type="text" label="VMPAYMENT_MULTISAFEPAY_API_KEY" description="VMPAYMENT_MULTISAFEPAY_API_KEY_DESC" />
