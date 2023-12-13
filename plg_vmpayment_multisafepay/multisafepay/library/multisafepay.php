@@ -52,6 +52,11 @@ use Psr\Http\Client\ClientExceptionInterface;
 
 class MultiSafepayLibrary
 {
+	//stAn - adds support for order prefix and sends system params from payment plugin
+	private $params = null; 
+	public function __construct($params) {
+		$this->params = $params; 
+	}
     /**
      * Returns a Sdk object
      *
@@ -230,11 +235,13 @@ class MultiSafepayLibrary
      */
     public function createPaymentOptions(array $order): PaymentOptions
     {
-        $plugin_response = 'option=com_virtuemart&view=pluginresponse&task=';
+        $plugin_response = 'option=com_virtuemart&view=vmplg&task=';
         $response_received = 'pluginResponseReceived';
         $payment_cancelled = 'pluginUserPaymentCancel';
 
-        $order_number = $order['details']['BT']->order_number;
+        //$order_number = $order['details']['BT']->order_number;
+		//stAn - adds support for order number prefix:
+		$order_number = $this->params->get('order_prefix', '').(string)$order['details']['BT']->order_number;
         $payment_id = $order['details']['BT']->virtuemart_paymentmethod_id;
         $base_url = JURI::root() . 'index.php?' . $plugin_response;
 
@@ -521,18 +528,21 @@ class MultiSafepayLibrary
             $final_price -= $final_price * ($coupon_percent / 100.00);
             $item_name .= ' - (Coupon applied: ' . $coupon_percent . '%)';
         }
-
+try {
         return $this->getCartItemObject(
-            $final_price,
-            $currency_code_3,
-            $item_name,
-            $item->product_quantity,
+            (float)$final_price,
+            (string)$currency_code_3,
+            (string)$item_name,
+            (int)$item->product_quantity,
             (string)$item->virtuemart_product_id,
-            $product_tax_percentage,
-            $this->stripDescription($item->product_desc ?: $item->product_s_desc, 200),
+            (float)$product_tax_percentage,
+            (string)$this->stripDescription($item->product_desc ?: $item->product_s_desc, 200),
             $product_weight_uom,
             $product_weight_value
         );
+} catch (Exception $e) {
+	die('x'); 
+}
     }
 
     /**
@@ -711,19 +721,19 @@ class MultiSafepayLibrary
      * @return bool
      * @since 4.0
      */
-    public function changeOrderStatusTo(string $order_number, object $method, array $data, string $status = ''): bool
+    public function changeOrderStatusTo(string $order_number_msp, object $method, array $data, string $status = ''): bool
     {
         try {
             $sdk = $this->getSdkObject($method);
             $transaction_manager = $sdk->getTransactionManager();
             $update_order = new UpdateRequest();
-            $update_order->addId($order_number);
+            $update_order->addId($order_number_msp);
             if (!empty($data)) {
                 $update_order->addData($data);
             } else {
                 $update_order->addStatus($status);
             }
-            $transaction_manager->update($order_number, $update_order);
+            $transaction_manager->update($order_number_msp, $update_order);
         } catch (ApiException | ClientExceptionInterface $e) {
             JLog::add($e->getMessage(), JLog::ERROR, 'com_virtuemart');
             vmError($e->getMessage());
@@ -740,12 +750,12 @@ class MultiSafepayLibrary
      * @return bool
      * @since 4.0
      */
-    public function getRefundObject(string $order_id, Money $amount, object $method): bool
+    public function getRefundObject(string $order_number_msp, Money $amount, object $method): bool
     {
         try {
             $sdk = $this->getSdkObject($method);
             $transaction_manager = $sdk->getTransactionManager();
-            $transaction = $transaction_manager->get($order_id);
+            $transaction = $transaction_manager->get($order_number_msp);
             $refund_request = (new RefundRequest())->addMoney($amount);
             $transaction_manager->refund($transaction, $refund_request);
         } catch (ApiException | ClientExceptionInterface $e) {
@@ -857,9 +867,21 @@ class MultiSafepayLibrary
 
         if (empty($user_identity)) {
             if (!is_null($app)) {
-                $user_identity = (string)$app->getIdentity()->get('id');
+				if (method_exists($app, 'getIdentity')) {
+					$identity = $app->getIdentity(); 
+					//stAn - j3.10 compat check
+					if ((!empty($identity) && (method_exists($identity, 'get')))) {
+						$user_identity = (string)$app->getIdentity()->get('id', 0);
+					}
+					else {
+						$user_identity = (string)JFactory::getUser()->get('id', 0);
+					}
+				}
+				else {
+					$user_identity = (string)JFactory::getUser()->get('id', 0);
+				}
             } else {
-                $user_identity = (string)JFactory::getUser()->id;
+                $user_identity = (string)JFactory::getUser()->get('id', 0);
             }
         }
         return $user_identity;
